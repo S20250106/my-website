@@ -1,26 +1,75 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我们一直是我们</title>
-    <link rel="stylesheet" href="style.css">
+
+    <!-- 引入 Auth0 SDK -->
+    <script src="https://cdn.auth0.com/js/auth0/9.16/auth0.min.js" defer></script>
+
+    <script defer>
+        // 初始化 Auth0 客户端
+        const auth0 = new auth0.WebAuth({
+            domain: 'dev-80ulduaxyp16gz2t.us.auth0.com',  // 替换为你的Auth0域名
+            clientID: '4oGOQjIbtaRiAu7nnILLda30lq4xIxia',   // 替换为你的Auth0客户端ID
+            redirectUri: 'https://s20250106.github.io/my-website/callback',  // 设置回调URL
+            audience: 'YOUR_AUTH0_API_IDENTIFIER',  // 可选
+            responseType: 'token id_token',
+            scope: 'openid profile'  // 请求访问用户的基本信息
+        });
+
+        // 登录函数
+        function login() {
+            auth0.authorize();  // 重定向到Auth0的登录页面
+        }
+
+        // 登出函数
+        function logout() {
+            auth0.logout({
+                returnTo: window.location.origin  // 登出后重定向到主页
+            });
+        }
+
+        // 处理回调并获取认证信息
+        function handleAuthentication() {
+            auth0.parseHash((err, authResult) => {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                if (authResult && authResult.idToken) {
+                    console.log(authResult.idToken);  // 打印ID Token
+                    console.log(authResult.accessToken);  // 打印Access Token
+
+                    // 将认证信息存储到localStorage
+                    localStorage.setItem('id_token', authResult.idToken);
+                    localStorage.setItem('access_token', authResult.accessToken);
+
+                    // 登录成功后重定向到主页
+                    window.location.href = '/';
+                }
+            });
+        }
+
+        // 处理回调页面中的认证信息
+        if (window.location.pathname === '/callback') {
+            handleAuthentication();
+        }
+    </script>
 </head>
 <body>
-    <header>
-        <h1>我们一直是我们</h1>
-        <p>2022.12.12---我们未完待续</p>
-    </header>
-    <section class="gallery">
-        <div class="gallery-item">
-            <img src="images/sample1.jpg" alt="作品1">
-            <h2>那一年我们情窦初开</h2>
-            <p>简短描述，关于作品的介绍。</p>
-        </div>
-    </section>
-    <footer>
-        <p>&copy; 2025 | 我们一直是我们</p>
-    </footer>
+    <h1>欢迎来到我的作品展示网站！</h1>
+    <p>这是一个用于展示我的图片、视频和动画的页面。</p>
+    
+    <!-- 登录按钮 -->
+    <button onclick="login()">登录</button>
+
+    <!-- 登出按钮 -->
+    <button onclick="logout()">登出</button>
+
+    <script>
+        // 在这里你可以进行其他的前端逻辑，例如显示用户信息等
+    </script>
 </body>
 </html>
-<script src="https://cdn.auth0.com/js/auth0/9.16/auth0.min.js"></script>
