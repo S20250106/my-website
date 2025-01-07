@@ -5,27 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的作品展示网站</title>
 
-    <!-- 引入 Auth0 SDK -->
+    <!-- 引入 Auth0 SDK，确保加上 defer 属性 -->
     <script src="https://cdn.auth0.com/js/auth0/9.16/auth0.min.js" defer></script>
 
     <script defer>
+        let auth0; // 在这里声明 auth0 变量，确保它不会在未初始化时被调用
+
         // 初始化 Auth0 客户端
-        const auth0 = new auth0.WebAuth({
-            domain: 'dev-730a0aroi5k47gjr.us.auth0.com',  // 替换为你的 Auth0 域名
-            clientID: '2R9bYa5ukdE97v2T6gKDT7LNiOVI016W',   // 替换为你的 Auth0 客户端ID
-            redirectUri: 'https://s20250106.github.io/my-website/callback',  // 设置回调URL
-            audience: 'YOUR_AUTH0_API_IDENTIFIER',  // 可选
-            responseType: 'token id_token',
-            scope: 'openid profile'  // 请求访问用户的基本信息
-        });
+        window.onload = function() {
+            auth0 = new auth0.WebAuth({
+                domain: 'dev-730a0aroi5k47gjr.us.auth0.com',  // 替换为你的 Auth0 域名
+                clientID: '2R9bYa5ukdE97v2T6gKDT7LNiOVI016W',   // 替换为你的 Auth0 客户端ID
+                redirectUri: 'https://s20250106.github.io/my-website/callback',  // 设置回调URL
+                audience: 'YOUR_AUTH0_API_IDENTIFIER',  // 可选
+                responseType: 'token id_token',
+                scope: 'openid profile'  // 请求访问用户的基本信息
+            });
+        }
 
         // 登录函数
         function login() {
-            auth0.authorize();  // 重定向到Auth0的登录页面
+            console.log("登录按钮被点击了");
+            if (!auth0) {
+                console.error("Auth0 SDK 尚未初始化");
+                return;
+            }
+            auth0.authorize();  // 调用 Auth0 的登录流程
         }
 
         // 登出函数
         function logout() {
+            if (!auth0) {
+                console.error("Auth0 SDK 尚未初始化");
+                return;
+            }
             auth0.logout({
                 returnTo: window.location.origin  // 登出后重定向到主页
             });
@@ -33,6 +46,10 @@
 
         // 处理回调并获取认证信息
         function handleAuthentication() {
+            if (!auth0) {
+                console.error("Auth0 SDK 尚未初始化");
+                return;
+            }
             auth0.parseHash((err, authResult) => {
                 if (err) {
                     console.error(err);
